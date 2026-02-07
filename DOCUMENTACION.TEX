@@ -1,0 +1,73 @@
+API PARA GENERAR URL:-api interna
+https://api-fotos-campig.onrender.com/api/subirImagen
+
+La api esta generada con nodejs , js y express.
+El objetivo prinsipal es subir una imagen y subirla a Cloudinary con el fin de obtener la url de la imagen.
+
+
+Seguridad: JWT
+La proteccion de los entpoinst se hace con un jwt y un middleware.
+El middleware espera en los headers una key authorization con el jwt,
+la api y la web comparten la misma llave secreta para el JWT entoces es facil de validar.
+Actualmente no es posbile: se reciebe tambien info de la persona que esta logeada (api prinsipal web) para saber 
+quien hace la peticion.
+
+ENTPOINST:
+
+La api expone solo 2 entopoint 
+1-post que recibe atravez de multer una imagen y la guarda en una carpete llamada uploads.
+  HEader authorization con el jwt. 
+POST /api/subirImagen.
+2-el endpoint para eliminar una imagen de cloudinary, 
+    HEader authorization con el jwt. 
+    body: public_id de la imagen a eliminar.
+DELETE /api/eliminarImagen.
+
+
+respuesta del post:
+Respuest positiva Ejemplo:
+{
+    "exito": true,
+    "mensaje": "Imagen subida correctamente",
+    "datos": {
+        "url": "https://res.cloudinary.com/dztepf7ty/image/upload/v1700340283/abcde.jpg",
+        "public_id": "abcde",
+        "formato": "jpg"
+    },
+    "error": null
+}
+Respuesta negativa Ejemplo:
+{
+    "exito": false,
+    "mensaje": "No se recibió ninguna imagen",
+    "datos": null,
+    "error": {
+        "nombre": "ErrorImagenNoRecibida",
+        "mensaje": "No se recibió ninguna imagen"
+    }
+}
+
+
+
+Debe mandar en los headers la key authorization con el jwt. 
+EJEMPLO DE PETICION CON FETCH subir imagen:
+fetch('https://api-fotos-campig.onrender.com/api/subirImagen', {
+    method: 'POST',
+    headers: {
+        'Authorization': 'Bearer TU_JWT_AQUI'
+    },
+    body: formData// imagen en formdata
+})  
+
+EJEMPLO DE PETICION CON FETCH eliminar imagen:
+    fetch('https://api-fotos-campig.onrender.com/api/eliminarImagen', {
+    method: 'DELETE',
+    headers: {
+        'Authorization': 'Bearer TU_JWT_AQUI'   
+    },
+    body: JSON.stringify({
+        public_id: "ID_DE_LA_IMAGEN_A_ELIMINAR"
+    })
+})  
+
+
